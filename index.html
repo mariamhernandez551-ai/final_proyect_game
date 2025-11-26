@@ -2,80 +2,49 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>El Mini Bosque - Proyecto Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El mini bosque - Proyecto Final</title>
+    <!-- Estilos Tailwind CSS para una presentación moderna -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Para centrar el contenido */
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
-            font-family: ui-sans-serif, system-ui;
-        }
-        /* Contenedor del juego */
-        .game-container {
-            background-color: #333;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            width: 90%;
-            max-width: 800px;
-        }
-        h1 {
-            color: #90ee90; /* Verde claro */
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        p {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-        /* Área del Applet */
+        /* Estilo base para el Applet */
         applet {
-            border: 4px solid #90ee90; /* Borde verde claro para el tablero */
-            border-radius: 0.5rem;
             display: block;
-            margin-top: 1rem;
+            margin: 0 auto;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
     </style>
+    <!-- Script de Cheerpj (Obligatorio para correr Applets en navegadores modernos) -->
+    <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
 
-    <div class="game-container">
-        <h1 class="text-center">🌳 El Mini Bosque 🍄</h1>
+    <div class="max-w-xl w-full bg-white p-6 rounded-xl shadow-2xl mt-8">
+        <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Bosque de los Susurros 🌳</h1>
         
-        <p class="text-sm text-center mb-4">
-            El juego se ejecuta en un Applet de Java, una tecnología antigua. Por favor, asegúrate de activar el plugin CheerpJ (el botón naranja de la esquina) si no ves el tablero.
-        </p>
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
+            <p>**REQUISITO DE LA CÁTEDRA** El juego se ejecuta en un Applet de Java, una tecnología antigua. Por favor, asegúrate de activar el plugin Cheerpj (el botón naranja de la esquina) si no ves el tablero.</p>
+        </div>
 
-        <!-- Applet de Java -->
-        <div class="flex justify-center">
-            <applet 
-                code="BosqueApplet.class" 
-                width="400" 
-                height="400"
-                alt="Juego de Applet - Requiere el plugin CheerpJ">
-                
-                <!-- Mensaje de fallback  -->
-                <p>El juego requiere un emulador de Java Applet (CheerpJ) para funcionar. Por favor, revisa la configuración del plugin.</p>
+        <!-- Contenedor del Applet (Asegúrate de que BosqueApplet.class esté en la carpeta raíz) -->
+        <div class="flex justify-center mb-6">
+            <applet code="BosqueApplet.class" width="400" height="520">
+                Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
         </div>
 
-        <div class="mt-6 p-4 bg-gray-700 rounded-lg text-sm">
-            <h2 class="text-lg text-white mb-2">Instrucciones del Juego:</h2>
-            <ul class="list-disc list-inside space-y-1 text-gray-300">
+        <!-- Panel de Instrucciones -->
+        <div class="bg-gray-700 p-4 rounded-lg text-white">
+            <h2 class="text-xl font-bold mb-3 border-b border-gray-500 pb-2">Instrucciones del Juego:</h2>
+            <ul class="list-disc list-inside space-y-1 text-sm">
                 <li>**Movimiento:** Usa las flechas (↑ ↓ ← →).</li>
                 <li>**Deshacer:** Presiona la tecla 'U' (Usa la Pila para el historial).</li>
-                <li>**Interaccion:** Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
+                <li>**Interacción:** Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
             </ul>
-            <p class="mt-4 text-xs text-yellow-300">
-                El codigo y la Matriz se ejecutan correctamente en el servidor.
-            </p>
+            <p class="mt-3 text-xs text-gray-400 text-center">El código y la Matriz se ejecutan correctamente en el servidor.</p>
+            <p class="text-xs text-gray-400 text-center">Por Mariam</p>
         </div>
     </div>
 
