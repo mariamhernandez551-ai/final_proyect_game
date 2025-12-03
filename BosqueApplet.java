@@ -41,7 +41,7 @@ public class BosqueApplet extends Applet implements KeyListener {
             {1,0,0,0,4,0,0,0,0,1},
             {1,0,1,1,1,1,1,1,0,1},
             {1,0,0,4,0,0,0,0,0,1},
-            {1,0,1,1,1,1,1,1,1,1},
+            {1,0,1,1,1,1,1,1,4,1},
             {1,0,0,0,0,3,0,0,0,1}
         },
         // Nivel 3: Encontrar el hongo dorado
