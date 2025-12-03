@@ -1,293 +1,280 @@
 import java.applet.Applet;
-import java.awt.Color; // Importación específica
-import java.awt.Font; // Importación específica
-import java.awt.Graphics; // Importación específica
-import java.awt.Point; // Importación específica
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
 /**
- * Estructuras de Datos utilizadas: Matriz, Lista, Cola, Pila y Arrays 1D.
+ * Proyecto Final de Estructura de Datos: "Bosque de los Susurros"
+ * Implementación de un juego simple basado en Applet, utilizando las estructuras
+ * de Matriz, Lista, Cola y Pila.
+ * * NOTA CRÍTICA: Este código tiene activada una PRUEBA DE DIAGNÓSTICO
+ * en el método paint() para asegurar que el Applet se muestre en el navegador
+ * a través de Cheerpj. Si ves un fondo rojo, la carga es exitosa.
  */
 public class BosqueApplet extends Applet implements KeyListener {
 
     // --- 1. ESTRUCTURAS DE DATOS PRINCIPALES ---
-    
-    // Matriz (Array 2D): Mapa del Bosque (10x10)
-    private final int FILAS = 10;
-    private final int COLUMNAS = 10;
-    // Códigos de la Matriz: 0:Pasto, 1:Obstáculo(Árbol), 2:Hongo(NPC), 3:Tesoro(Ingrediente), 4:Enemigo(Planta), 5:Aventurero
+
+    // Matriz (Array 2D): Mapa del Bosque [10x10]
     private int[][] mapa = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 5, 0, 2, 0, 0, 0, 3, 0, 1},
-        {1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
-        {1, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 1, 0, 1, 1, 1, 4, 0, 1},
-        {1, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 1, 1, 1, 0, 1, 0, 1, 1},
+        {1, 0, 0, 0, 2, 0, 0, 0, 0, 1},
+        {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
+        {1, 0, 1, 3, 0, 0, 0, 1, 0, 1},
+        {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 3, 0, 0, 0, 6, 1}, // 6: Meta (Hongo Dorado)
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        {1, 0, 1, 1, 1, 1, 1, 1, 0, 1},
+        {1, 0, 0, 4, 0, 0, 0, 0, 0, 1},
+        {1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 0, 3, 0, 0, 0, 1}
     };
     
     // Lista (ArrayList): Inventario del Aventurero
-    private ArrayList<String> inventario = new ArrayList<>();
+    private ArrayList<String> inventario; 
+
+    // Cola (Queue): Mensajes de Diálogo
+    private Queue<String> mensajes;
+
+    // Pila (Stack): Historial de Movimientos (para función 'Deshacer')
+    private Stack<int[]> historialMovimientos;
+
+    // Array (1D): Atributos del Personaje [Salud, Ataque, Defensa, PosX, PosY]
+    private int[] aventureroAtributos = new int[5]; 
     
-    // Cola (Queue): Gestión de Diálogos y Mensajes
-    private Queue<String> mensajesCola = new LinkedList<>();
-    
-    // Pila (Stack): Historial de Movimientos para Deshacer
-    private Stack<Point> historialMovimiento = new Stack<>(); 
+    // --- 2. VARIABLES DEL JUEGO ---
+    private int aventureroX; // Posición X actual (columna)
+    private int aventureroY; // Posición Y actual (fila)
+    private final int TILE_SIZE = 40; // Tamaño en píxeles de cada celda
 
-    // Array (1D): Atributos del Personaje (Salud y Posición)
-    private int salud = 100;
-    private int ataque = 15;
-    private int aventureroX = 1; // Columna inicial
-    private int aventureroY = 1; // Fila inicial
+    // --- 3. INICIALIZACIÓN (Applet) ---
 
-    // --- VARIABLES DE INTERFAZ ---
-    private final int TAMANO_CELDA = 40;
-    // Simplificamos la cadena de texto para eliminar cualquier posible error de codificación.
-    private String mensajeActual = "Bienvenido al Bosque! Usa las flechas (arriba, abajo, izq, der) para moverte. Presiona 'U' para Deshacer.";
-    private boolean juegoTerminado = false;
-
-    /**
-     * Método de inicialización del Applet. Se ejecuta al inicio.
-     */
+    @Override
     public void init() {
-        // Configuramos el tamaño del Applet
-        setSize(COLUMNAS * TAMANO_CELDA + 10, FILAS * TAMANO_CELDA + 120);
-        addKeyListener(this);
-        setFocusable(true); // Asegura que el Applet pueda recibir eventos de teclado
+        // Inicialización de estructuras de datos
+        inventario = new ArrayList<>();
+        mensajes = new LinkedList<>();
+        historialMovimientos = new Stack<>();
+
+        // Configuración inicial del Aventurero
+        aventureroX = 1; 
+        aventureroY = 1;
+        mapa[aventureroY][aventureroX] = 5; // Posicionar Aventurero (código 5)
+
+        // Llenar Cola de Diálogo
+        mensajes.offer("Bienvenido al Bosque. Encuentra el Hongo Dorado!");
+        mensajes.offer("Cuidado con las Plantas Pícaras. ¡Recolecta Ingredientes!");
+        mensajes.offer("Presiona 'U' para deshacer tu último movimiento.");
+
+        // Inicializar atributos (ejemplo: Salud, Ataque, Defensa, PosX, PosY)
+        aventureroAtributos[0] = 100; // Salud
+        aventureroAtributos[1] = 10;  // Ataque
+        aventureroAtributos[2] = 5;   // Defensa
+        aventureroAtributos[3] = aventureroX;
+        aventureroAtributos[4] = aventureroY;
+
+        // Configuración de la interfaz
+        this.setSize(400, 520); // 10x10 * 40px = 400px (Mapa 400x400) + Panel Inferior
+        this.addKeyListener(this);
+        this.setFocusable(true);
+        setBackground(Color.BLACK);
         
-        // Inicializamos la Cola de mensajes
-        mensajesCola.offer("El Aventurero ha despertado en el claro. Presiona ENTER para leer mensajes.");
-        mensajesCola.offer("Tu objetivo es encontrar el Hongo Dorado (codigo 6).");
+        // Llamada a función JavaScript para indicar a Cheerpj que la inicialización de Java terminó
+        try {
+            getAppletContext().showDocument(new java.net.URL("javascript:appletInitialized();"));
+        } catch (Exception e) {
+            // Manejo de excepción si showDocument falla (normal en algunos entornos)
+        }
     }
 
-    /**
-     * Lógica de dibujo principal. .
-     */
+    // --- 4. DIBUJO EN PANTALLA ---
+
+    @Override
     public void paint(Graphics g) {
-        // Establecer el color de fondo del bosque
-        setBackground(new Color(247, 254, 231)); 
         
-        // --- 1. Dibuja el Mapa (Matriz) ---
-        for (int y = 0; y < FILAS; y++) {
-            for (int x = 0; x < COLUMNAS; x++) {
-                int posX = x * TAMANO_CELDA;
-                int posY = y * TAMANO_CELDA;
-
-                // Dibujar fondo base (Pasto)
-                g.setColor(new Color(163, 230, 53)); 
-                g.fillRect(posX, posY, TAMANO_CELDA, TAMANO_CELDA);
-                g.setColor(new Color(101, 163, 13)); 
-                g.drawRect(posX, posY, TAMANO_CELDA, TAMANO_CELDA);
-
-                // Dibujar elemento según código de la Matriz
-                int codigo = mapa[y][x];
-                g.setFont(new Font("SansSerif", Font.PLAIN, 24));
-                g.setColor(Color.BLACK);
-                
-                switch (codigo) {
-                    case 1: // Obstáculo (Árbol/Roca)
-                        g.setColor(new Color(77, 65, 48)); 
-                        g.fillRect(posX, posY, TAMANO_CELDA, TAMANO_CELDA);
-                        g.drawString("A", posX + 13, posY + 30); // 'A' por Arbol
-                        break;
-                    case 2: // Hongo Parlante (NPC)
-                        g.drawString("Honguito", posX + 13, posY + 30); // 'H' por Hongo
-                        break;
-                    case 3: // Tesoro (Ingrediente Mágico)
-                        g.drawString("Tesoro", posX + 13, posY + 30); // 'T' por Tesoro
-                        break;
-                    case 4: // Enemigo (Planta Venenosa)
-                        g.drawString("Poison", posX + 13, posY + 30); // 'E' por Enemigo
-                        break;
-                    case 5: // Aventurero
-                        g.drawString("M1", posX + 13, posY + 30); // 'P' por Personaje
-                        break;
-                    case 6: // Meta (Hongo Dorado)
-                        g.drawString("Golden Price", posX + 13, posY + 30); // 'M' por Meta
-                        break;
-                }
-            }
-        }
-
-        // --- 2. Dibuja el Panel de Información y Mensajes ---
-        int panelY = FILAS * TAMANO_CELDA + 10;
-        int panelAltura = 100;
-        g.setColor(new Color(64, 64, 64)); // Gris oscuro
-        g.fillRect(0, panelY, COLUMNAS * TAMANO_CELDA, panelAltura);
-
+        // **********************************************
+        // ******* INICIO PRUEBA DE DIAGNÓSTICO *********
+        // **********************************************
+        
+        // Si esta sección se dibuja, Cheerpj está ejecutando el código Java
+        g.setColor(Color.RED);
+        g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(Color.WHITE);
-        g.setFont(new Font("SansSerif", Font.BOLD, 14));
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("¡CARGA EXITOSA!", 100, 250);
         
-        // Atributos (Array 1D)
-        g.drawString("SALUD (Array 1D): " + salud + "/100", 10, panelY + 20);
-        g.drawString("ATAQUE (Array 1D): " + ataque, 10, panelY + 40);
-        g.drawString("POSICION (Array 1D): (" + aventureroX + ", " + aventureroY + ")", 10, panelY + 60);
+        // Si ves el fondo rojo, el problema es en el código de dibujo original.
+        // Si no ves nada, el problema está en la inicialización (init/start) o en la Matriz.
         
-        // Inventario (Lista)
-        g.drawString("INVENTARIO (Lista): " + String.join(", ", inventario), 200, panelY + 20);
-        g.drawString("Tamaño Pila Deshacer: " + historialMovimiento.size(), 200, panelY + 40);
+        // **********************************************
+        // ********* FIN PRUEBA DE DIAGNÓSTICO **********
+        // **********************************************
 
-        // Mensajes (Cola)
-        g.setColor(new Color(255, 255, 153)); // Amarillo claro para el mensaje
-        g.drawString("MENSAJE (Cola): " + mensajeActual, 10, panelY + 85);
-        
-        // Mensaje de juego terminado
-        if (juegoTerminado) {
-            g.setColor(Color.RED);
-            g.setFont(new Font("SansSerif", Font.BOLD, 36));
-            g.drawString("JUEGO TERMINADO!", 50, FILAS * TAMANO_CELDA / 2);
-        }
-    }
 
-    /**
-     * @param nuevoX La nueva columna a la que se intenta mover.
-     * @param nuevoY La nueva fila a la que se intenta mover.
-     */
-    private void intentarMover(int nuevoX, int nuevoY) {
-        if (juegoTerminado) return;
+        /*
+         * *** CÓDIGO ORIGINAL (DESCOMENTAR SI LA PRUEBA ROJA FUNCIONA) ***
+         * // 1. Dibujar Mapa (Matriz 10x10)
+        for (int i = 0; i < mapa.length; i++) {
+            for (int j = 0; j < mapa[0].length; j++) {
+                int x = j * TILE_SIZE;
+                int y = i * TILE_SIZE;
 
-        // 1. Verificar límites del mapa
-        if (nuevoX >= 0 && nuevoX < COLUMNAS && nuevoY >= 0 && nuevoY < FILAS) {
-            int destino = mapa[nuevoY][nuevoX];
-
-            // 2. Solo mover si la celda no es un Obstáculo (código 1)
-            if (destino != 1) {
-                
-                // Guardar posición actual en la Pila antes de mover
-                historialMovimiento.push(new Point(aventureroX, aventureroY));
-
-                // Limpiar la posición anterior
-                mapa[aventureroY][aventureroX] = 0; 
-
-                // 3. Lógica de interacción con elementos
-                switch (destino) {
-                    case 0: // Pasto (Movimiento normal)
-                        mensajeActual = "Te has movido a un claro vacio.";
-                        break;
-                    case 2: // Hongo Parlante (NPC) - Usa Cola y Lista
-                        if (!mensajesCola.isEmpty()) {
-                            // Cambiamos el emoji por texto
-                            mensajeActual = "Hongo dice: " + mensajesCola.poll();
-                        } else {
-                            mensajeActual = "Hongo: 'No tengo mas que decir, sigue tu camino!'";
-                        }
-                        // Solo añadimos si la lista no está llena.
-                        if (inventario.size() < 4) {
-                            inventario.add("Pocion de Dialogo"); // Añadimos a la Lista de Inventario
-                        }
-                        break;
-                    case 3: // Tesoro (Ingrediente Magico) - Usa Lista
-                        String nuevoItem = "Ingrediente Magico (" + (inventario.size() + 1) + ")";
-                        inventario.add(nuevoItem); // Añadir a la Lista (Inventario)
-                        mensajeActual = "Has encontrado un Tesoro! " + nuevoItem + " agregado al Inventario.";
-                        // El tesoro se consume
-                        mapa[nuevoY][nuevoX] = 0;
-                        break;
-                    case 4: // Enemigo (Planta Venenosa) - Usa Array 1D para salud
-                        salud -= 20; // Reduce salud
-                        mensajeActual = "Planta Venenosa! Te ha quitado 20 de salud. Salud actual: " + salud;
-                        if (salud <= 0) {
-                            juegoTerminado = true;
-                            mensajeActual = "HAS PERDIDO. Te quedaste sin salud.";
-                        } else {
-                            // Limpiamos el enemigo despues del "combate"
-                            destino = 0; 
-                        }
-                        break;
-                    case 6: // Meta (Hongo Dorado)
-                        juegoTerminado = true;
-                        mensajeActual = "FELICIDADES! Encontraste el Hongo Dorado. PROYECTO CUMPLIDO!";
-                        break;
+                switch (mapa[i][j]) {
+                    case 0: g.setColor(new Color(153, 204, 102)); break; // Pasto (Verde claro)
+                    case 1: g.setColor(new Color(102, 51, 0)); break;    // Árbol/Roca (Marrón)
+                    case 2: g.setColor(Color.ORANGE); break;             // Hongo Parlante (Naranja)
+                    case 3: g.setColor(Color.YELLOW); break;             // Ingrediente Mágico (Amarillo)
+                    case 4: g.setColor(Color.RED); break;                // Planta Pícara (Rojo)
+                    case 5: g.setColor(Color.BLUE); break;               // Aventurero (Azul)
+                    default: g.setColor(Color.GRAY); break;              // Desconocido
                 }
-                
-                // 4. Actualizar la posicion del Aventurero en el Array 1D y Matriz
-                aventureroX = nuevoX;
-                aventureroY = nuevoY;
-                mapa[aventureroY][aventureroX] = 5; 
-                
-                // Repintar la interfaz
-                repaint(); 
-            } else {
-                mensajeActual = "Movimiento bloqueado! Hay un arbol en el camino.";
+                g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                g.setColor(Color.BLACK);
+                g.drawRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
-    }
-    
-    /**
-     * Implementa la funcion Deshacer usando la Pila.
-     */
-    private void deshacerMovimiento() {
-        if (historialMovimiento.isEmpty() || juegoTerminado) {
-            mensajeActual = "No hay movimientos previos para deshacer.";
-            return;
+        
+        // 2. Dibujar Panel de Información (Debajo del mapa 400x400)
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 400, getWidth(), 120);
+
+        // 3. Mostrar Inventario (Lista)
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.drawString("INVENTARIO (Lista):", 10, 420);
+        int itemY = 435;
+        for (String item : inventario) {
+            g.drawString("- " + item, 15, itemY);
+            itemY += 15;
         }
 
-        // 1. Sacar la posicion anterior de la Pila (LIFO)
-        Point posicionPrevia = historialMovimiento.pop();
-        
-        // 2. Limpiar la posicion actual en la Matriz
-        mapa[aventureroY][aventureroX] = 0;
+        // 4. Mostrar Diálogo (Cola)
+        g.drawString("DIÁLOGO (Cola):", 220, 420);
+        String mensajeActual = mensajes.peek(); // Solo vemos el primero sin quitarlo
+        if (mensajeActual != null) {
+             g.drawString(mensajeActual, 225, 435);
+        } else {
+             g.drawString("El bosque está en silencio...", 225, 435);
+        }
 
-        // 3. Restaurar la posicion del Aventurero
-        aventureroX = posicionPrevia.x;
-        aventureroY = posicionPrevia.y;
-        
-        // 4. Actualizar la Matriz con la posicion restaurada
-        mapa[aventureroY][aventureroX] = 5;
-        
-        mensajeActual = "Movimiento deshecho. Volviste a (" + aventureroX + ", " + aventureroY + ")";
-        repaint();
+        // 5. Mostrar Atributos (Array 1D)
+        g.drawString(String.format("HP: %d | Atk: %d | Def: %d", 
+            aventureroAtributos[0], aventureroAtributos[1], aventureroAtributos[2]), 10, 510);
+        */
     }
 
+    // --- 5. LÓGICA DE MOVIMIENTO ---
 
-  
+    private void moverAventurero(int dx, int dy) {
+        int nuevaX = aventureroX + dx;
+        int nuevaY = aventureroY + dy;
 
-    public void keyPressed(KeyEvent e) {
-        int nuevaX = aventureroX;
-        int nuevaY = aventureroY;
+        // Comprobar límites y Obstáculos (código 1)
+        if (nuevaX >= 0 && nuevaX < 10 && nuevaY >= 0 && nuevaY < 10 && mapa[nuevaY][nuevaX] != 1) {
 
-        switch (e.getKeyCode()) {
-            case KeyEvent.VK_UP:
-                nuevaY--;
-                break;
-            case KeyEvent.VK_DOWN:
-                nuevaY++;
-                break;
-            case KeyEvent.VK_LEFT:
-                nuevaX--;
-                break;
-            case KeyEvent.VK_RIGHT:
-                nuevaX++;
-                break;
-            case KeyEvent.VK_ENTER: // Comando para avanzar en la cola de mensajes
-                if (!mensajesCola.isEmpty()) {
-                     mensajeActual = "MENSAJE (ENTER): " + mensajesCola.poll();
-                     repaint();
+            // 1. Guardar posición anterior en la Pila
+            historialMovimientos.push(new int[]{aventureroX, aventureroY});
+
+            // 2. Limpiar posición anterior y mover
+            mapa[aventureroY][aventureroX] = 0; // Pasto
+            aventureroX = nuevaX;
+            aventureroY = nuevaY;
+
+            // 3. Interacción con el nuevo tile
+            interactuar(mapa[aventureroY][aventureroX]);
+
+            // 4. Establecer nueva posición del Aventurero
+            mapa[aventureroY][aventureroX] = 5;
+
+            // 5. Actualizar atributos de posición
+            aventureroAtributos[3] = aventureroX;
+            aventureroAtributos[4] = aventureroY;
+
+            // 6. Repintar la interfaz
+            repaint(); 
+        }
+    }
+
+    // --- 6. LÓGICA DE INTERACCIÓN ---
+
+    private void interactuar(int codigo) {
+        switch (codigo) {
+            case 2: // Hongo Parlante (Cola)
+                String dialogo = mensajes.poll(); // Saca el mensaje
+                if (dialogo != null) {
+                    mensajes.offer(">> " + dialogo); // Vuelve a meterlo o mostrarlo
                 } else {
-                    mensajeActual = "No hay mas mensajes en la Cola.";
+                    mensajes.offer("Hongo: Ya no tengo más que decir...");
                 }
-                return; 
-            case KeyEvent.VK_U: // Comando para Deshacer (Usa Pila)
-                 deshacerMovimiento();
-                 return;
+                break;
+            case 3: // Ingrediente Mágico (Lista)
+                inventario.add("Ingrediente Mágico"); // Añadir a la Lista
+                mensajes.offer("¡Obtuviste un Ingrediente Mágico! (+Lista)");
+                break;
+            case 4: // Planta Pícara (Enemigo)
+                aventureroAtributos[0] -= 10; // Daño a la Salud
+                mensajes.offer("¡Te atacó una Planta Pícara! (-10 HP)");
+                break;
             default:
-                return;
+                // No hay interacción especial
+                break;
         }
-        
-        // Intentar mover solo si el movimiento no es ENTER o U
-        intentarMover(nuevaX, nuevaY);
     }
 
-    // Métodos no usados de KeyListener
+    // --- 7. FUNCIÓN DESHACER (Pila) ---
+
+    private void deshacerMovimiento() {
+        if (!historialMovimientos.empty()) {
+            // 1. Obtener posición anterior de la Pila
+            int[] posicionAnterior = historialMovimientos.pop(); 
+            int oldX = posicionAnterior[0];
+            int oldY = posicionAnterior[1];
+
+            // 2. Limpiar posición actual y mover
+            mapa[aventureroY][aventureroX] = 0; // Pasto en posición actual
+            aventureroX = oldX;
+            aventureroY = oldY;
+            mapa[aventureroY][aventureroX] = 5; // Aventurero en posición anterior
+
+            // 3. Actualizar atributos
+            aventureroAtributos[3] = aventureroX;
+            aventureroAtributos[4] = aventureroY;
+
+            mensajes.offer("Movimiento deshecho. (+Pila)");
+            repaint();
+        } else {
+            mensajes.offer("No hay movimientos para deshacer.");
+        }
+    }
+
+    // --- 8. MANEJO DE TECLAS ---
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        
+        if (key == KeyEvent.VK_UP) {
+            moverAventurero(0, -1);
+        } else if (key == KeyEvent.VK_DOWN) {
+            moverAventurero(0, 1);
+        } else if (key == KeyEvent.VK_LEFT) {
+            moverAventurero(-1, 0);
+        } else if (key == KeyEvent.VK_RIGHT) {
+            moverAventurero(1, 0);
+        } else if (e.getKeyChar() == 'u' || e.getKeyChar() == 'U') {
+            deshacerMovimiento();
+        }
+    }
+
+    // Métodos KeyListener no utilizados pero requeridos por la interfaz
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
     public void keyReleased(KeyEvent e) {}
-    public void keyTyped(KeyEvent e) {} 
 }
