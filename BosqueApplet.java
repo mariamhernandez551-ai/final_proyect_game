@@ -6,14 +6,14 @@ import java.util.*;
 
 public class BosqueApplet extends Applet implements KeyListener {
 
-    // --- COLORES PASTEL ---
-    private final Color PASTO = new Color(189, 236, 182); // Verde pastel
-    private final Color TRONCO = new Color(245, 222, 179); // Crema
-    private final Color HONGO = new Color(255, 203, 164); // Naranja pastel
-    private final Color FLOR = new Color(255, 249, 196); // Amarillo pastel
-    private final Color PLANTA = new Color(255, 182, 193); // Rosa pastel
-    private final Color MIN = new Color(173, 216, 230); // Azul cielo pastel
-    private final Color HONGO_DORADO = new Color(255, 223, 128); // Dorado pastel
+    // --- COLORES MÁS FUERTES ---
+    private final Color PASTO = new Color(120, 200, 120); // Verde vivo
+    private final Color TRONCO = new Color(210, 180, 140); // Marrón claro
+    private final Color HONGO = new Color(255, 160, 80); // Naranja fuerte
+    private final Color FLOR = new Color(255, 230, 80); // Amarillo fuerte
+    private final Color PLANTA = new Color(255, 120, 160); // Rosa fuerte
+    private final Color MIN = new Color(80, 180, 255); // Azul cielo fuerte
+    private final Color HONGO_DORADO = new Color(255, 215, 0); // Dorado fuerte
     private final Color PANEL = new Color(220, 230, 241); // Panel info azul muy claro
 
     // --- MAPAS DE NIVELES ---
@@ -147,7 +147,7 @@ public class BosqueApplet extends Applet implements KeyListener {
                         g.setColor(TRONCO);
                         g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                         // Dibuja líneas para simular tronco
-                        g.setColor(new Color(210, 180, 140));
+                        g.setColor(new Color(160, 120, 80));
                         g.drawLine(x+10, y+10, x+30, y+30);
                         g.drawLine(x+30, y+10, x+10, y+30);
                         break;
@@ -166,7 +166,7 @@ public class BosqueApplet extends Applet implements KeyListener {
                         g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                         g.setColor(FLOR);
                         g.fillOval(x+13, y+13, 14, 14);
-                        g.setColor(new Color(255, 220, 220));
+                        g.setColor(new Color(255, 220, 120));
                         g.drawOval(x+13, y+13, 14, 14);
                         break;
                     case 4: // Planta pícara
@@ -174,7 +174,7 @@ public class BosqueApplet extends Applet implements KeyListener {
                         g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                         g.setColor(PLANTA);
                         g.fillOval(x+10, y+10, 20, 20);
-                        g.setColor(new Color(200, 120, 120));
+                        g.setColor(new Color(200, 80, 120));
                         g.drawLine(x+20, y+30, x+20, y+38);
                         break;
                     case 5: // Min
@@ -199,7 +199,7 @@ public class BosqueApplet extends Applet implements KeyListener {
                         break;
                 }
                 // Bordes de celda
-                g.setColor(new Color(220, 220, 220));
+                g.setColor(new Color(180, 180, 180));
                 g.drawRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
@@ -305,7 +305,8 @@ public class BosqueApplet extends Applet implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (nivelCompletado && e.getKeyCode() == KeyEvent.VK_ENTER) {
+        // --- CAMBIO DE NIVEL CON ENTER ---
+        if (nivelCompletado && (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyChar() == '\n')) {
             if (juegoGanado) {
                 iniciarNivel(0); // Reinicia el juego
             } else {
