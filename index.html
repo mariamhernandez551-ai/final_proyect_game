@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <title>El Mini Bosque - Proyecto Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Estilos Tailwind CSS para una presentación moderna -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Base para el Applet */
-        applet {
+        /* Estilo base para el Applet */
+        #bosqueApplet {
             display: block;
             margin: 0 auto;
             border: 2px solid #5a5a5a;
@@ -17,23 +18,32 @@
             height: 520px;
         }
     </style>
+    <!-- Script de Cheerpj (Obligatorio para correr Applets en navegadores modernos) -->
+    <!-- CRÍTICO: Usamos el atributo data-cheerpj-init="Applet.start" para forzar el inicio -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
 
     <div class="max-w-xl w-full bg-white p-6 rounded-xl shadow-2xl mt-8">
-        <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Mini Bosque 🌳</h1>
+        <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Bosque de los Susurros 🌳</h1>
         
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
+            <p>**ENTREGA FINAL** El Applet se está forzando a cargar con Java 11. Puede tomar unos 5 a 10 segundos en aparecer por primera vez. ¡Ya casi lo tienes!</p>
         </div>
 
         <!-- Contenedor del Applet con el atributo de compatibilidad Java 11 -->
         <div class="flex justify-center mb-6" id="applet-container">
-            <applet id="bosqueApplet" code="BosqueApplet.class" width="400" height="520" data-cheerpj-jvm-version="11" style="display: none;">
+            <!-- Quitamos el display:none y usamos el init forzado -->
+            <applet 
+                id="bosqueApplet" 
+                code="BosqueApplet.class" 
+                width="400" 
+                height="520" 
+                data-cheerpj-jvm-version="11"
+                data-cheerpj-init="Applet.start">
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
-            <!-- Indicador de carga -->
-            <div id="loadingMessage" class="text-gray-600 font-bold p-10">Cargando Bosque... (Espera unos segundos)</div>
+            
         </div>
 
         <!-- PANEL DE INSTRUCCIONES -->
@@ -49,37 +59,14 @@
         </div>
     </div>
     
-    <!-- SCRIPT FINAL: Controla la carga y asegura que el Applet se muestre solo cuando esté listo -->
+    <!-- Quitamos el script grande y solo aseguramos que el motor esté listo -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const appletElement = document.getElementById('bosqueApplet');
-            const loadingMessage = document.getElementById('loadingMessage');
-            appletElement.style.display = 'none';
-            loadingMessage.style.display = 'block';
-
-            // 2. Esta función se llama cuando Cheerpj ha terminado de cargar el Applet
-            window.cheerpjReady = function() {
-                console.log("Cheerpj cargado correctamente. Iniciando Applet.");
-                
-                // Ocultar mensaje de carga y mostrar el Applet
-                loadingMessage.style.display = 'none';
-                appletElement.style.display = 'block';
-            };
-            
-            // 3. Forzamos el inicio del motor Cheerpj
-            // Esto es necesario para que el Applet se cargue correctamente en Render
+        // Esto solo asegura que el script de Cheerpj se ejecute, pero la carga la maneja el atributo 'data-cheerpj-init'
+        window.onload = function() {
             if (typeof cpjRunApplet === 'function') {
                 cpjRunApplet();
             }
-        });
-        
-        // El Applet llama a este método al finalizar su inicialización interna.
-        function appletInitialized() {
-            // Llama a la función que muestra el Applet.
-            if (typeof window.cheerpjReady === 'function') {
-                window.cheerpjReady();
-            }
-        }
+        };
     </script>
 
 </body>
