@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilo base para el Applet */
+        /* Base para el Applet */
         applet {
             display: block;
             margin: 0 auto;
@@ -27,10 +27,13 @@
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
         </div>
 
+        <!-- Contenedor del Applet con el atributo de compatibilidad Java 11 -->
         <div class="flex justify-center mb-6" id="applet-container">
-            <applet code="BosqueApplet.class" width="400" height="520" data-cheerpj-jvm-version="11">
+            <applet id="bosqueApplet" code="BosqueApplet.class" width="400" height="520" data-cheerpj-jvm-version="11" style="display: none;">
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
+            <!-- Indicador de carga -->
+            <div id="loadingMessage" class="text-gray-600 font-bold p-10">Cargando Bosque... (Espera unos segundos)</div>
         </div>
 
         <!-- PANEL DE INSTRUCCIONES -->
@@ -46,15 +49,37 @@
         </div>
     </div>
     
-    <!--  Fuerza la activación de Cheerpj al cargar la página -->
+    <!-- SCRIPT FINAL: Controla la carga y asegura que el Applet se muestre solo cuando esté listo -->
     <script>
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const appletElement = document.getElementById('bosqueApplet');
+            const loadingMessage = document.getElementById('loadingMessage');
+            appletElement.style.display = 'none';
+            loadingMessage.style.display = 'block';
+
+            // 2. Esta función se llama cuando Cheerpj ha terminado de cargar el Applet
+            window.cheerpjReady = function() {
+                console.log("Cheerpj cargado correctamente. Iniciando Applet.");
+                
+                // Ocultar mensaje de carga y mostrar el Applet
+                loadingMessage.style.display = 'none';
+                appletElement.style.display = 'block';
+            };
+            
+            // 3. Forzamos el inicio del motor Cheerpj
+            // Esto es necesario para que el Applet se cargue correctamente en Render
             if (typeof cpjRunApplet === 'function') {
                 cpjRunApplet();
-            } else {
-                console.error("Cheerpj no se cargó correctamente. El Applet no funcionará localmente.");
             }
-        };
+        });
+        
+        // El Applet llama a este método al finalizar su inicialización interna.
+        function appletInitialized() {
+            // Llama a la función que muestra el Applet.
+            if (typeof window.cheerpjReady === 'function') {
+                window.cheerpjReady();
+            }
+        }
     </script>
 
 </body>
