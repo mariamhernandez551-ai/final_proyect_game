@@ -6,19 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Base para el Applet */
+        /* Estilo base para el Applet */
         applet {
             display: block;
             margin: 0 auto;
             border: 2px solid #5a5a5a;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            /* Aseguramos que el contenedor tenga el tamaño exacto */
             width: 400px;
             height: 520px;
         }
     </style>
-    <!-- Script de Cheerpj (Obligatorio para correr Applets en navegadores modernos) -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
@@ -30,7 +28,7 @@
         </div>
 
         <div class="flex justify-center mb-6" id="applet-container">
-            <applet code="BosqueApplet.class" width="400" height="520">
+            <applet code="BosqueApplet.class" width="400" height="520" data-cheerpj-jvm-version="11">
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
         </div>
@@ -51,11 +49,9 @@
     <!--  Fuerza la activación de Cheerpj al cargar la página -->
     <script>
         window.onload = function() {
-            // Verifica si Cheerpj está definido y fuerza el inicio.
             if (typeof cpjRunApplet === 'function') {
                 cpjRunApplet();
             } else {
-                // Si la consola está abierta (F12), este mensaje aparecerá.
                 console.error("Cheerpj no se cargó correctamente. El Applet no funcionará localmente.");
             }
         };
