@@ -18,7 +18,7 @@ public class BosqueApplet extends Applet implements KeyListener {
 
     // --- MAPAS DE NIVELES ---
     private final int[][][] NIVELES = {
-        // Nivel 1: Recolectar 3 flores mágicas
+        // Nivel 1: Recolectar 3 flores mágicas (¡ahora sí hay 3!)
         {
             {1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,2,0,0,0,0,1},
@@ -31,7 +31,7 @@ public class BosqueApplet extends Applet implements KeyListener {
             {1,0,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,3,0,0,0,1}
         },
-        // Nivel 2: Vencer 5 plantas pícaras
+        // Nivel 2: Vencer 5 plantas pícaras (¡ahora sí hay 5!)
         {
             {1,1,1,1,1,1,1,1,1,1},
             {1,0,4,0,2,0,4,0,0,1},
@@ -41,7 +41,7 @@ public class BosqueApplet extends Applet implements KeyListener {
             {1,0,0,0,4,0,0,0,0,1},
             {1,0,1,1,1,1,1,1,0,1},
             {1,0,0,4,0,0,0,0,0,1},
-            {1,0,1,1,1,1,1,1,4,1},
+            {1,0,1,1,1,1,1,1,4,1}, // Planta extra aquí
             {1,0,0,0,0,3,0,0,0,1}
         },
         // Nivel 3: Encontrar el hongo dorado
@@ -55,7 +55,7 @@ public class BosqueApplet extends Applet implements KeyListener {
             {1,0,1,1,1,1,1,1,0,1},
             {1,0,0,4,0,0,0,0,0,1},
             {1,0,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,6,0,0,0,1} // 6 = Hongo dorado
+            {1,0,0,0,0,6,0,0,0,1}
         }
     };
 
@@ -77,6 +77,11 @@ public class BosqueApplet extends Applet implements KeyListener {
 
     private int minX, minY;
     private final int TILE_SIZE = 40;
+
+    // --- NUEVAS VARIABLES PARA TIEMPO Y PUNTOS ---
+    private long tiempoInicio = 0;
+    private long tiempoFin = 0;
+    private int puntuacion = 0;
 
     @Override
     public void init() {
@@ -101,6 +106,12 @@ public class BosqueApplet extends Applet implements KeyListener {
         plantasVencidas = 0;
         nivelCompletado = false;
         juegoGanado = false;
+
+        // Reinicia tiempo y puntuación solo si es el primer nivel
+        if (nivel == 0) {
+            tiempoInicio = System.currentTimeMillis();
+            puntuacion = 0;
+        }
 
         // Busca posición inicial de Min
         minX = 1;
@@ -231,6 +242,10 @@ public class BosqueApplet extends Applet implements KeyListener {
         else if (nivelActual == 2)
             g.drawString("Objetivo: Encuentra el hongo dorado", 10, 480);
 
+        // --- NUEVO: TIEMPO Y PUNTUACIÓN ---
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.drawString("Tiempo: " + getTiempoFormateado() + "   |   Puntos: " + puntuacion, 200, 510);
+
         // Mensaje de nivel completado o victoria
         if (nivelCompletado) {
             g.setColor(new Color(120, 180, 255, 180));
@@ -260,26 +275,32 @@ public class BosqueApplet extends Applet implements KeyListener {
         minX = nuevaX;
         minY = nuevaY;
 
-        // Interacción
+        // --- LÓGICA DE OBJETOS Y PUNTOS ---
         if (nivelActual == 0 && celda == 3) { // Flor mágica
             floresRecolectadas++;
             inventario.add("Flor mágica");
             mensajes.offer("¡Min encontró una flor mágica!");
+            puntuacion += 10;
             if (floresRecolectadas >= 3) {
                 nivelCompletado = true;
             }
-        } else if (nivelActual == 1 && celda == 4) { // Planta pícara
-            plantasVencidas++;
-            inventario.add("Poción");
+        } else if (celda == 4) { // Planta pícara en cualquier nivel
             minAtributos[0] -= 10;
-            mensajes.offer("¡Min venció una planta pícara! (-10 HP, +Poción)");
-            if (plantasVencidas >= 5) {
-                nivelCompletado = true;
+            inventario.add("Poción");
+            mensajes.offer("¡Min pasó por una planta pícara! (-10 HP, +Poción)");
+            puntuacion += 15;
+            if (nivelActual == 1) {
+                plantasVencidas++;
+                if (plantasVencidas >= 5) {
+                    nivelCompletado = true;
+                }
             }
         } else if (nivelActual == 2 && celda == 6) { // Hongo dorado
             inventario.add("Hongo dorado");
+            puntuacion += 50;
             nivelCompletado = true;
             juegoGanado = true;
+            tiempoFin = System.currentTimeMillis();
         } else if (celda == 2) { // Honguito parlante
             mensajes.offer("Honguito: ¡Hola Min! Sigue explorando.");
         }
@@ -324,4 +345,12 @@ public class BosqueApplet extends Applet implements KeyListener {
     }
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyReleased(KeyEvent e) {}
+
+    // --- MÉTODO PARA FORMATEAR EL TIEMPO ---
+    private String getTiempoFormateado() {
+        long tiempoActual = (juegoGanado ? tiempoFin : System.currentTimeMillis()) - tiempoInicio;
+        int segundos = (int) (tiempoActual / 1000) % 60;
+        int minutos = (int) (tiempoActual / 60000);
+        return String.format("%02d:%02d", minutos, segundos);
+    }
 }
