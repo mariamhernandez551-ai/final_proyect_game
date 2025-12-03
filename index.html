@@ -6,15 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilo base para el Applet */
+        /* Base para el Applet */
         applet {
             display: block;
             margin: 0 auto;
             border: 2px solid #5a5a5a;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            /* Aseguramos que el contenedor tenga el tamaño exacto */
+            width: 400px;
+            height: 520px;
         }
     </style>
+    <!-- Script de Cheerpj (Obligatorio para correr Applets en navegadores modernos) -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
@@ -23,17 +27,15 @@
         <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Mini Bosque 🌳</h1>
         
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
-            <p>**REQUISITO DE LA CÁTEDRA** El juego se ejecuta en un Applet de Java, una tecnología antigua. Por favor, asegúrate de activar el plugin Cheerpj (el botón naranja de la esquina) si no ves el tablero.</p>
         </div>
 
-        <!-- Contenedor del Applet (Asegúrate de que BosqueApplet.class esté en la carpeta raíz) -->
-        <div class="flex justify-center mb-6">
+        <div class="flex justify-center mb-6" id="applet-container">
             <applet code="BosqueApplet.class" width="400" height="520">
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
         </div>
 
-        <!-- Panel de Instrucciones -->
+        <!-- PANEL DE INSTRUCCIONES -->
         <div class="bg-gray-700 p-4 rounded-lg text-white">
             <h2 class="text-xl font-bold mb-3 border-b border-gray-500 pb-2">Instrucciones del Juego:</h2>
             <ul class="list-disc list-inside space-y-1 text-sm">
@@ -45,6 +47,19 @@
             <p class="text-xs text-gray-400 text-center">Por Mariam</p>
         </div>
     </div>
+    
+    <!--  Fuerza la activación de Cheerpj al cargar la página -->
+    <script>
+        window.onload = function() {
+            // Verifica si Cheerpj está definido y fuerza el inicio.
+            if (typeof cpjRunApplet === 'function') {
+                cpjRunApplet();
+            } else {
+                // Si la consola está abierta (F12), este mensaje aparecerá.
+                console.error("Cheerpj no se cargó correctamente. El Applet no funcionará localmente.");
+            }
+        };
+    </script>
 
 </body>
 </html>
