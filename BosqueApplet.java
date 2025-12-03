@@ -13,8 +13,6 @@ import java.util.Stack;
  * Proyecto Final de Estructura de Datos: "Bosque de los Susurros"
  * Implementación de un juego simple basado en Applet, utilizando las estructuras
  * de Matriz, Lista, Cola y Pila.
- * NOTA: La prueba de diagnóstico de fondo rojo ha sido eliminada.
- * Este código contiene la lógica completa para dibujar el tablero y el panel de información.
  */
 public class BosqueApplet extends Applet implements KeyListener {
 
@@ -33,9 +31,9 @@ public class BosqueApplet extends Applet implements KeyListener {
         {1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 0, 0, 0, 0, 3, 0, 0, 0, 1}
     };
-    
+
     // Lista (ArrayList): Inventario del Aventurero
-    private ArrayList<String> inventario; 
+    private ArrayList<String> inventario;
 
     // Cola (Queue): Mensajes de Diálogo
     private Queue<String> mensajes;
@@ -44,8 +42,8 @@ public class BosqueApplet extends Applet implements KeyListener {
     private Stack<int[]> historialMovimientos;
 
     // Array (1D): Atributos del Personaje [Salud, Ataque, Defensa, PosX, PosY]
-    private int[] aventureroAtributos = new int[5]; 
-    
+    private int[] aventureroAtributos = new int[5];
+
     // --- 2. VARIABLES DEL JUEGO ---
     private int aventureroX; // Posición X actual (columna)
     private int aventureroY; // Posición Y actual (fila)
@@ -61,7 +59,7 @@ public class BosqueApplet extends Applet implements KeyListener {
         historialMovimientos = new Stack<>();
 
         // Configuración inicial del Aventurero
-        aventureroX = 1; 
+        aventureroX = 1;
         aventureroY = 1;
         mapa[aventureroY][aventureroX] = 5; // Posicionar Aventurero (código 5)
 
@@ -81,22 +79,20 @@ public class BosqueApplet extends Applet implements KeyListener {
         this.setSize(400, 520); // 10x10 * 40px = 400px (Mapa 400x400) + Panel Inferior
         this.addKeyListener(this);
         this.setFocusable(true);
-        setBackground(Color.BLACK);
-        
-        // Llamada a función JavaScript para indicar a Cheerpj que la inicialización de Java terminó
-        try {
-            getAppletContext().showDocument(new java.net.URL("javascript:appletInitialized();"));
-        } catch (Exception e) {
-            // Manejo de excepción si showDocument falla (normal en algunos entornos)
-        }
+        setBackground(Color.WHITE); // Fondo claro
+
+        // No uses showDocument ni llamadas a JS aquí
     }
 
     // --- 4. DIBUJO EN PANTALLA (CÓDIGO DE JUEGO ACTIVO) ---
 
     @Override
     public void paint(Graphics g) {
-        
-        // 1. Dibujar Mapa (Matriz 10x10)
+        // 1. Dibujar fondo del mapa (blanco)
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, 400, 400);
+
+        // 2. Dibujar Mapa (Matriz 10x10)
         for (int i = 0; i < mapa.length; i++) {
             for (int j = 0; j < mapa[0].length; j++) {
                 int x = j * TILE_SIZE;
@@ -116,12 +112,12 @@ public class BosqueApplet extends Applet implements KeyListener {
                 g.drawRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
-        
-        // 2. Dibujar Panel de Información (Debajo del mapa 400x400)
-        g.setColor(Color.DARK_GRAY);
+
+        // 3. Dibujar Panel de Información (Debajo del mapa 400x400)
+        g.setColor(new Color(40, 40, 60)); // Gris oscuro azulado
         g.fillRect(0, 400, getWidth(), 120);
 
-        // 3. Mostrar Inventario (Lista)
+        // 4. Mostrar Inventario (Lista)
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 12));
         g.drawString("INVENTARIO (Lista):", 10, 420);
@@ -131,17 +127,17 @@ public class BosqueApplet extends Applet implements KeyListener {
             itemY += 15;
         }
 
-        // 4. Mostrar Diálogo (Cola)
+        // 5. Mostrar Diálogo (Cola)
         g.drawString("DIÁLOGO (Cola):", 220, 420);
         String mensajeActual = mensajes.peek(); // Solo vemos el primero sin quitarlo
         if (mensajeActual != null) {
-             g.drawString(mensajeActual, 225, 435);
+            g.drawString(mensajeActual, 225, 435);
         } else {
-             g.drawString("El bosque está en silencio...", 225, 435);
+            g.drawString("El bosque está en silencio...", 225, 435);
         }
 
-        // 5. Mostrar Atributos (Array 1D)
-        g.drawString(String.format("HP: %d | Atk: %d | Def: %d", 
+        // 6. Mostrar Atributos (Array 1D)
+        g.drawString(String.format("HP: %d | Atk: %d | Def: %d",
             aventureroAtributos[0], aventureroAtributos[1], aventureroAtributos[2]), 10, 510);
     }
 
@@ -173,7 +169,7 @@ public class BosqueApplet extends Applet implements KeyListener {
             aventureroAtributos[4] = aventureroY;
 
             // 6. Repintar la interfaz
-            repaint(); 
+            repaint();
         }
     }
 
@@ -208,7 +204,7 @@ public class BosqueApplet extends Applet implements KeyListener {
     private void deshacerMovimiento() {
         if (!historialMovimientos.empty()) {
             // 1. Obtener posición anterior de la Pila
-            int[] posicionAnterior = historialMovimientos.pop(); 
+            int[] posicionAnterior = historialMovimientos.pop();
             int oldX = posicionAnterior[0];
             int oldY = posicionAnterior[1];
 
@@ -234,7 +230,7 @@ public class BosqueApplet extends Applet implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        
+
         if (key == KeyEvent.VK_UP) {
             moverAventurero(0, -1);
         } else if (key == KeyEvent.VK_DOWN) {
