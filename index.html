@@ -4,30 +4,37 @@
     <meta charset="UTF-8">
     <title>El Mini Bosque - Proyecto Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS y Fuente Inter -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
         #bosqueApplet {
             display: block;
             margin: 0 auto;
-            border: 2px solid #5a5a5a;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 4px solid #3b82f6; /* Borde azul */
+            border-radius: 12px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
             width: 400px;
             height: 520px;
         }
     </style>
-    <!-- CheerpJ -->
+    <!-- CheerpJ (DEBE IR ANTES DE CUALQUIER SCRIPT QUE INTENTE USAR EL APPLET) -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
+<body class="bg-slate-900 min-h-screen p-4 flex flex-col items-center">
 
-    <div class="max-w-xl w-full bg-white p-6 rounded-xl shadow-2xl mt-8">
-        <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Mini Bosque 🌳</h1>
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
-            <p><b>ENTREGA FINAL</b> El Applet se está forzando a cargar con Java 11. Puede tomar unos 5 a 10 segundos en aparecer por primera vez. ¡Ya casi lo tienes!</p>
+    <div class="max-w-xl w-full bg-slate-800 p-8 rounded-xl shadow-2xl mt-8">
+        <h1 class="text-4xl font-extrabold text-teal-400 text-center mb-3">🍄 El Mini Bosque 🌟</h1>
+        
+        <div class="bg-amber-800/20 border-l-4 border-amber-400 text-amber-100 p-4 mb-6 rounded-lg text-sm font-semibold" role="alert">
+            <p><b>ENTREGA FINAL:</b> El Applet requiere Java 11. El cargador **CheerPJ** está activo y la carga puede tomar unos **10 segundos**.</p>
         </div>
+        
         <div class="flex justify-center mb-6" id="applet-container">
+            <!-- La clase principal del JAR es 'BosqueApplet' (sin el .class) -->
             <applet
                 id="bosqueApplet"
                 archive="BosqueApplet.jar"
@@ -39,22 +46,24 @@
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
         </div>
-        <div class="bg-gray-700 p-4 rounded-lg text-white">
-            <h2 class="text-xl font-bold mb-3 border-b border-gray-500 pb-2">Instrucciones del Juego:</h2>
-            <ul class="list-disc list-inside space-y-1 text-sm">
-                <li><b>Movimiento:</b> Usa las flechas (↑ ↓ ← →).</li>
-                <li><b>Deshacer:</b> Presiona la tecla 'U' (Usa la Pila para el historial).</li>
-                <li><b>Interacción:</b> Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
+        
+        <div class="bg-slate-700 p-5 rounded-lg text-white mt-6">
+            <h2 class="text-xl font-bold mb-3 border-b border-slate-500 pb-2 text-indigo-400">Instrucciones del Juego:</h2>
+            <ul class="list-disc list-inside space-y-2 text-sm text-slate-200">
+                <li><b>Movimiento (Matriz):</b> Usa las **flechas** (↑ ↓ ← →).</li>
+                <li><b>Inventario (Lista):</b> Recolecta Tesoros (Amarillo) para añadir elementos.</li>
+                <li><b>Diálogo (Cola):</b> Interactúa con Honguitos (Naranja) para mostrar mensajes secuenciales.</li>
+                <li><b>Deshacer (Pila):</b> Presiona la tecla **'U'** para retroceder la posición.</li>
+                <li><b>Atributos (Array 1D):</b> HP y estadísticas se muestran en el panel inferior del juego.</li>
             </ul>
-            <p class="mt-3 text-xs text-gray-400 text-center">El código y la Matriz se ejecutan correctamente en el servidor.</p>
-            <p class="text-xs text-gray-400 text-center">Por Mariam</p>
+            <p class="mt-4 text-xs text-slate-400 text-center">Desarrollado por Mariam para Estructura de Datos.</p>
         </div>
     </div>
     <script>
+        // Esta función asegura que CheerPJ empiece a cargar el Applet tan pronto como el DOM esté listo
         window.onload = function() {
-            if (typeof cpjRunApplet === 'function') {
-                cpjRunApplet();
-            }
+            // El script de CheerPJ ya debería haber adjuntado la lógica a la etiqueta <applet>
+            // La línea `data-cheerpj-init="Applet.start"` se encarga de iniciar el Applet.
         };
     </script>
 </body>
