@@ -1,253 +1,326 @@
 import java.applet.Applet;
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
-/**
- * Proyecto Final de Estructura de Datos: "Bosque de los Susurros"
- * Implementación de un juego simple basado en Applet, utilizando las estructuras
- * de Matriz, Lista, Cola y Pila.
- */
 public class BosqueApplet extends Applet implements KeyListener {
 
-    // --- 1. ESTRUCTURAS DE DATOS PRINCIPALES ---
+    // --- COLORES PASTEL ---
+    private final Color PASTO = new Color(189, 236, 182); // Verde pastel
+    private final Color TRONCO = new Color(245, 222, 179); // Crema
+    private final Color HONGO = new Color(255, 203, 164); // Naranja pastel
+    private final Color FLOR = new Color(255, 249, 196); // Amarillo pastel
+    private final Color PLANTA = new Color(255, 182, 193); // Rosa pastel
+    private final Color MIN = new Color(173, 216, 230); // Azul cielo pastel
+    private final Color HONGO_DORADO = new Color(255, 223, 128); // Dorado pastel
+    private final Color PANEL = new Color(220, 230, 241); // Panel info azul muy claro
 
-    // Matriz (Array 2D): Mapa del Bosque [10x10]
-    private int[][] mapa = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 2, 0, 0, 0, 0, 1},
-        {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
-        {1, 0, 1, 3, 0, 0, 0, 1, 0, 1},
-        {1, 0, 1, 1, 1, 1, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 1, 1, 1, 1, 1, 1, 0, 1},
-        {1, 0, 0, 4, 0, 0, 0, 0, 0, 1},
-        {1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 3, 0, 0, 0, 1}
+    // --- MAPAS DE NIVELES ---
+    private final int[][][] NIVELES = {
+        // Nivel 1: Recolectar 3 flores mágicas
+        {
+            {1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,2,0,0,0,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,1,3,0,0,0,1,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,0,0,0,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,0,1},
+            {1,0,0,4,0,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,3,0,0,0,1}
+        },
+        // Nivel 2: Vencer 5 plantas pícaras
+        {
+            {1,1,1,1,1,1,1,1,1,1},
+            {1,0,4,0,2,0,4,0,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,1,3,0,0,0,1,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,0,0,4,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,0,1},
+            {1,0,0,4,0,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,3,0,0,0,1}
+        },
+        // Nivel 3: Encontrar el hongo dorado
+        {
+            {1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,2,0,0,0,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,1,4,0,0,0,1,0,1},
+            {1,0,1,1,1,1,0,1,0,1},
+            {1,0,0,0,0,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,0,1},
+            {1,0,0,4,0,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,6,0,0,0,1} // 6 = Hongo dorado
+        }
     };
 
-    // Lista (ArrayList): Inventario del Aventurero
+    // --- CÓDIGOS DE CELDA ---
+    // 0: Pasto, 1: Tronco, 2: Honguito parlante, 3: Flor mágica, 4: Planta pícara, 5: Min, 6: Hongo dorado
+
+    // --- VARIABLES DEL JUEGO ---
+    private int[][] mapa;
+    private int nivelActual = 0;
+    private int floresRecolectadas = 0;
+    private int plantasVencidas = 0;
+    private boolean nivelCompletado = false;
+    private boolean juegoGanado = false;
+
     private ArrayList<String> inventario;
-
-    // Cola (Queue): Mensajes de Diálogo
     private Queue<String> mensajes;
-
-    // Pila (Stack): Historial de Movimientos (para función 'Deshacer')
     private Stack<int[]> historialMovimientos;
+    private int[] minAtributos = new int[5]; // Salud, Ataque, Defensa, PosX, PosY
 
-    // Array (1D): Atributos del Personaje [Salud, Ataque, Defensa, PosX, PosY]
-    private int[] aventureroAtributos = new int[5];
-
-    // --- 2. VARIABLES DEL JUEGO ---
-    private int aventureroX; // Posición X actual (columna)
-    private int aventureroY; // Posición Y actual (fila)
-    private final int TILE_SIZE = 40; // Tamaño en píxeles de cada celda
-
-    // --- 3. INICIALIZACIÓN (Applet) ---
+    private int minX, minY;
+    private final int TILE_SIZE = 40;
 
     @Override
     public void init() {
-        // Inicialización de estructuras de datos
+        iniciarNivel(0);
+        this.setSize(400, 520);
+        this.addKeyListener(this);
+        this.setFocusable(true);
+        setBackground(Color.WHITE);
+    }
+
+    private void iniciarNivel(int nivel) {
+        // Copia el mapa del nivel
+        mapa = new int[10][10];
+        for (int i = 0; i < 10; i++)
+            System.arraycopy(NIVELES[nivel][i], 0, mapa[i], 0, 10);
+
         inventario = new ArrayList<>();
         mensajes = new LinkedList<>();
         historialMovimientos = new Stack<>();
+        nivelActual = nivel;
+        floresRecolectadas = 0;
+        plantasVencidas = 0;
+        nivelCompletado = false;
+        juegoGanado = false;
 
-        // Configuración inicial del Aventurero
-        aventureroX = 1;
-        aventureroY = 1;
-        mapa[aventureroY][aventureroX] = 5; // Posicionar Aventurero (código 5)
+        // Busca posición inicial de Min
+        minX = 1;
+        minY = 1;
+        mapa[minY][minX] = 5;
 
-        // Llenar Cola de Diálogo
-        mensajes.offer("Bienvenido al Bosque. Encuentra el Hongo Dorado!");
-        mensajes.offer("Cuidado con las Plantas Pícaras. ¡Recolecta Ingredientes!");
-        mensajes.offer("Presiona 'U' para deshacer tu último movimiento.");
+        // Atributos: Salud, Ataque, Defensa, PosX, PosY
+        minAtributos[0] = 100;
+        minAtributos[1] = 10;
+        minAtributos[2] = 5;
+        minAtributos[3] = minX;
+        minAtributos[4] = minY;
 
-        // Inicializar atributos (ejemplo: Salud, Ataque, Defensa, PosX, PosY)
-        aventureroAtributos[0] = 100; // Salud
-        aventureroAtributos[1] = 10;  // Ataque
-        aventureroAtributos[2] = 5;   // Defensa
-        aventureroAtributos[3] = aventureroX;
-        aventureroAtributos[4] = aventureroY;
-
-        // Configuración de la interfaz
-        this.setSize(400, 520); // 10x10 * 40px = 400px (Mapa 400x400) + Panel Inferior
-        this.addKeyListener(this);
-        this.setFocusable(true);
-        setBackground(Color.WHITE); // Fondo claro
-
-        // No uses showDocument ni llamadas a JS aquí
+        // Mensajes de bienvenida por nivel
+        if (nivel == 0) {
+            mensajes.offer("¡Bienvenido, Min el explorador!");
+            mensajes.offer("Nivel 1: Recolecta 3 flores mágicas.");
+        } else if (nivel == 1) {
+            mensajes.offer("¡Nivel 2! Vence 5 plantas pícaras.");
+        } else if (nivel == 2) {
+            mensajes.offer("¡Nivel final! Encuentra el hongo dorado.");
+        }
+        repaint();
     }
-
-    // --- 4. DIBUJO EN PANTALLA (CÓDIGO DE JUEGO ACTIVO) ---
 
     @Override
     public void paint(Graphics g) {
-        // 1. Dibujar fondo del mapa (blanco)
+        // Fondo del mapa
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, 400, 400);
 
-        // 2. Dibujar Mapa (Matriz 10x10)
-        for (int i = 0; i < mapa.length; i++) {
-            for (int j = 0; j < mapa[0].length; j++) {
+        // Dibuja el mapa
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
                 int x = j * TILE_SIZE;
                 int y = i * TILE_SIZE;
 
                 switch (mapa[i][j]) {
-                    case 0: g.setColor(new Color(153, 204, 102)); break; // Pasto (Verde claro)
-                    case 1: g.setColor(new Color(102, 51, 0)); break;    // Árbol/Roca (Marrón)
-                    case 2: g.setColor(Color.ORANGE); break;             // Hongo Parlante (Naranja)
-                    case 3: g.setColor(Color.YELLOW); break;             // Ingrediente Mágico (Amarillo)
-                    case 4: g.setColor(Color.RED); break;                // Planta Pícara (Rojo)
-                    case 5: g.setColor(Color.BLUE); break;               // Aventurero (Azul)
-                    default: g.setColor(Color.GRAY); break;              // Desconocido
+                    case 0: // Pasto
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        break;
+                    case 1: // Tronco
+                        g.setColor(TRONCO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        // Dibuja líneas para simular tronco
+                        g.setColor(new Color(210, 180, 140));
+                        g.drawLine(x+10, y+10, x+30, y+30);
+                        g.drawLine(x+30, y+10, x+10, y+30);
+                        break;
+                    case 2: // Honguito parlante
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        // Tallo
+                        g.setColor(Color.WHITE);
+                        g.fillRect(x+17, y+25, 6, 10);
+                        // Sombrero
+                        g.setColor(HONGO);
+                        g.fillOval(x+10, y+10, 20, 18);
+                        break;
+                    case 3: // Flor mágica
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        g.setColor(FLOR);
+                        g.fillOval(x+13, y+13, 14, 14);
+                        g.setColor(new Color(255, 220, 220));
+                        g.drawOval(x+13, y+13, 14, 14);
+                        break;
+                    case 4: // Planta pícara
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        g.setColor(PLANTA);
+                        g.fillOval(x+10, y+10, 20, 20);
+                        g.setColor(new Color(200, 120, 120));
+                        g.drawLine(x+20, y+30, x+20, y+38);
+                        break;
+                    case 5: // Min
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        g.setColor(MIN);
+                        g.fillOval(x+10, y+10, 20, 20);
+                        g.setColor(Color.BLACK);
+                        g.drawOval(x+10, y+10, 20, 20);
+                        break;
+                    case 6: // Hongo dorado
+                        g.setColor(PASTO);
+                        g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        // Tallo
+                        g.setColor(new Color(255, 255, 224));
+                        g.fillRect(x+17, y+25, 6, 10);
+                        // Sombrero dorado
+                        g.setColor(HONGO_DORADO);
+                        g.fillOval(x+10, y+10, 20, 18);
+                        g.setColor(new Color(255, 215, 0));
+                        g.drawOval(x+10, y+10, 20, 18);
+                        break;
                 }
-                g.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                g.setColor(Color.BLACK);
+                // Bordes de celda
+                g.setColor(new Color(220, 220, 220));
                 g.drawRect(x, y, TILE_SIZE, TILE_SIZE);
             }
         }
 
-        // 3. Dibujar Panel de Información (Debajo del mapa 400x400)
-        g.setColor(new Color(40, 40, 60)); // Gris oscuro azulado
-        g.fillRect(0, 400, getWidth(), 120);
+        // Panel de información
+        g.setColor(PANEL);
+        g.fillRect(0, 400, 400, 120);
 
-        // 4. Mostrar Inventario (Lista)
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 12));
-        g.drawString("INVENTARIO (Lista):", 10, 420);
-        int itemY = 435;
-        for (String item : inventario) {
-            g.drawString("- " + item, 15, itemY);
-            itemY += 15;
-        }
+        g.setColor(new Color(60, 60, 90));
+        g.setFont(new Font("Arial", Font.BOLD, 13));
+        g.drawString("Min el explorador | HP: " + minAtributos[0] + " | Atk: " + minAtributos[1] + " | Def: " + minAtributos[2], 10, 420);
 
-        // 5. Mostrar Diálogo (Cola)
-        g.drawString("DIÁLOGO (Cola):", 220, 420);
-        String mensajeActual = mensajes.peek(); // Solo vemos el primero sin quitarlo
+        g.setFont(new Font("Arial", Font.PLAIN, 12));
+        g.drawString("Inventario: " + inventario, 10, 440);
+
+        // Diálogo
+        g.setFont(new Font("Arial", Font.ITALIC, 12));
+        String mensajeActual = mensajes.peek();
         if (mensajeActual != null) {
-            g.drawString(mensajeActual, 225, 435);
-        } else {
-            g.drawString("El bosque está en silencio...", 225, 435);
+            g.drawString("Mensaje: " + mensajeActual, 10, 460);
         }
 
-        // 6. Mostrar Atributos (Array 1D)
-        g.drawString(String.format("HP: %d | Atk: %d | Def: %d",
-            aventureroAtributos[0], aventureroAtributos[1], aventureroAtributos[2]), 10, 510);
-    }
+        // Objetivo del nivel
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        if (nivelActual == 0)
+            g.drawString("Objetivo: Recolecta 3 flores mágicas (" + floresRecolectadas + "/3)", 10, 480);
+        else if (nivelActual == 1)
+            g.drawString("Objetivo: Vence 5 plantas pícaras (" + plantasVencidas + "/5)", 10, 480);
+        else if (nivelActual == 2)
+            g.drawString("Objetivo: Encuentra el hongo dorado", 10, 480);
 
-    // --- 5. LÓGICA DE MOVIMIENTO ---
-
-    private void moverAventurero(int dx, int dy) {
-        int nuevaX = aventureroX + dx;
-        int nuevaY = aventureroY + dy;
-
-        // Comprobar límites y Obstáculos (código 1)
-        if (nuevaX >= 0 && nuevaX < 10 && nuevaY >= 0 && nuevaY < 10 && mapa[nuevaY][nuevaX] != 1) {
-
-            // 1. Guardar posición anterior en la Pila
-            historialMovimientos.push(new int[]{aventureroX, aventureroY});
-
-            // 2. Limpiar posición anterior y mover
-            mapa[aventureroY][aventureroX] = 0; // Pasto
-            aventureroX = nuevaX;
-            aventureroY = nuevaY;
-
-            // 3. Interacción con el nuevo tile
-            interactuar(mapa[aventureroY][aventureroX]);
-
-            // 4. Establecer nueva posición del Aventurero
-            mapa[aventureroY][aventureroX] = 5;
-
-            // 5. Actualizar atributos de posición
-            aventureroAtributos[3] = aventureroX;
-            aventureroAtributos[4] = aventureroY;
-
-            // 6. Repintar la interfaz
-            repaint();
+        // Mensaje de nivel completado o victoria
+        if (nivelCompletado) {
+            g.setColor(new Color(120, 180, 255, 180));
+            g.fillRoundRect(60, 180, 280, 60, 20, 20);
+            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.BOLD, 18));
+            if (juegoGanado)
+                g.drawString("¡Felicidades, ganaste!", 100, 215);
+            else
+                g.drawString("¡Nivel completado!", 110, 215);
+            g.setFont(new Font("Arial", Font.PLAIN, 13));
+            g.drawString("Presiona ENTER para continuar", 110, 235);
         }
     }
 
-    // --- 6. LÓGICA DE INTERACCIÓN ---
+    // --- MOVIMIENTO Y LÓGICA DE JUEGO ---
+    private void moverMin(int dx, int dy) {
+        if (nivelCompletado) return;
+        int nuevaX = minX + dx;
+        int nuevaY = minY + dy;
+        if (nuevaX < 0 || nuevaX >= 10 || nuevaY < 0 || nuevaY >= 10) return;
+        int celda = mapa[nuevaY][nuevaX];
+        if (celda == 1) return; // Tronco
 
-    private void interactuar(int codigo) {
-        switch (codigo) {
-            case 2: // Hongo Parlante (Cola)
-                String dialogo = mensajes.poll(); // Saca el mensaje
-                if (dialogo != null) {
-                    mensajes.offer(">> " + dialogo); // Vuelve a meterlo o mostrarlo
-                } else {
-                    mensajes.offer("Hongo: Ya no tengo más que decir...");
-                }
-                break;
-            case 3: // Ingrediente Mágico (Lista)
-                inventario.add("Ingrediente Mágico"); // Añadir a la Lista
-                mensajes.offer("¡Obtuviste un Ingrediente Mágico! (+Lista)");
-                break;
-            case 4: // Planta Pícara (Enemigo)
-                aventureroAtributos[0] -= 10; // Daño a la Salud
-                mensajes.offer("¡Te atacó una Planta Pícara! (-10 HP)");
-                break;
-            default:
-                // No hay interacción especial
-                break;
+        historialMovimientos.push(new int[]{minX, minY});
+        mapa[minY][minX] = 0; // Limpia posición anterior
+        minX = nuevaX;
+        minY = nuevaY;
+
+        // Interacción
+        if (nivelActual == 0 && celda == 3) { // Flor mágica
+            floresRecolectadas++;
+            inventario.add("Flor mágica");
+            mensajes.offer("¡Min encontró una flor mágica!");
+            if (floresRecolectadas >= 3) {
+                nivelCompletado = true;
+            }
+        } else if (nivelActual == 1 && celda == 4) { // Planta pícara
+            plantasVencidas++;
+            inventario.add("Poción");
+            minAtributos[0] -= 10;
+            mensajes.offer("¡Min venció una planta pícara! (-10 HP, +Poción)");
+            if (plantasVencidas >= 5) {
+                nivelCompletado = true;
+            }
+        } else if (nivelActual == 2 && celda == 6) { // Hongo dorado
+            inventario.add("Hongo dorado");
+            nivelCompletado = true;
+            juegoGanado = true;
+        } else if (celda == 2) { // Honguito parlante
+            mensajes.offer("Honguito: ¡Hola Min! Sigue explorando.");
         }
-    }
 
-    // --- 7. FUNCIÓN DESHACER (Pila) ---
+        mapa[minY][minX] = 5; // Min en nueva posición
+        minAtributos[3] = minX;
+        minAtributos[4] = minY;
+        repaint();
+    }
 
     private void deshacerMovimiento() {
+        if (nivelCompletado) return;
         if (!historialMovimientos.empty()) {
-            // 1. Obtener posición anterior de la Pila
-            int[] posicionAnterior = historialMovimientos.pop();
-            int oldX = posicionAnterior[0];
-            int oldY = posicionAnterior[1];
-
-            // 2. Limpiar posición actual y mover
-            mapa[aventureroY][aventureroX] = 0; // Pasto en posición actual
-            aventureroX = oldX;
-            aventureroY = oldY;
-            mapa[aventureroY][aventureroX] = 5; // Aventurero en posición anterior
-
-            // 3. Actualizar atributos
-            aventureroAtributos[3] = aventureroX;
-            aventureroAtributos[4] = aventureroY;
-
-            mensajes.offer("Movimiento deshecho. (+Pila)");
+            int[] pos = historialMovimientos.pop();
+            mapa[minY][minX] = 0;
+            minX = pos[0];
+            minY = pos[1];
+            mapa[minY][minX] = 5;
+            mensajes.offer("Min deshizo su último movimiento.");
             repaint();
-        } else {
-            mensajes.offer("No hay movimientos para deshacer.");
         }
     }
-
-    // --- 8. MANEJO DE TECLAS ---
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-
-        if (key == KeyEvent.VK_UP) {
-            moverAventurero(0, -1);
-        } else if (key == KeyEvent.VK_DOWN) {
-            moverAventurero(0, 1);
-        } else if (key == KeyEvent.VK_LEFT) {
-            moverAventurero(-1, 0);
-        } else if (key == KeyEvent.VK_RIGHT) {
-            moverAventurero(1, 0);
-        } else if (e.getKeyChar() == 'u' || e.getKeyChar() == 'U') {
-            deshacerMovimiento();
+        if (nivelCompletado && e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (juegoGanado) {
+                iniciarNivel(0); // Reinicia el juego
+            } else {
+                iniciarNivel(nivelActual + 1);
+            }
+            return;
+        }
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP: moverMin(0, -1); break;
+            case KeyEvent.VK_DOWN: moverMin(0, 1); break;
+            case KeyEvent.VK_LEFT: moverMin(-1, 0); break;
+            case KeyEvent.VK_RIGHT: moverMin(1, 0); break;
+            case KeyEvent.VK_U: deshacerMovimiento(); break;
         }
     }
-
-    // Métodos KeyListener no utilizados pero requeridos por la interfaz
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
+    @Override public void keyTyped(KeyEvent e) {}
+    @Override public void keyReleased(KeyEvent e) {}
 }

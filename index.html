@@ -10,22 +10,26 @@
         #bosqueApplet {
             display: block;
             margin: 0 auto;
-            border: 2px solid #5a5a5a;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid #b3c6e7;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(173, 216, 230, 0.25);
             width: 400px;
             height: 520px;
+            background: #f8fafc;
+        }
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #f8fafc 100%);
         }
     </style>
     <!-- CheerpJ -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
+<body class="min-h-screen p-4 flex flex-col items-center">
 
-    <div class="max-w-xl w-full bg-white p-6 rounded-xl shadow-2xl mt-8">
-        <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Mini Bosque 🌳</h1>
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
-            <p><b>ENTREGA FINAL</b> El Applet se está forzando a cargar con Java 11. Puede tomar unos 5 a 10 segundos en aparecer por primera vez. ¡Ya casi lo tienes!</p>
+    <div class="max-w-xl w-full bg-white/80 p-6 rounded-xl shadow-2xl mt-8 border border-blue-100">
+        <h1 class="text-3xl font-extrabold text-blue-400 text-center mb-2">🌱 El Mini Bosque 🌱</h1>
+        <div class="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-6 rounded-lg text-sm" role="alert">
+            <p><b>ENTREGA FINAL</b> | Ayuda a <b>Min el explorador</b> a superar los 3 niveles del bosque mágico. Usa las flechas para moverte, <b>U</b> para deshacer y <b>ENTER</b> para avanzar de nivel.</p>
         </div>
         <div class="flex justify-center mb-6" id="applet-container">
             <applet
@@ -39,15 +43,16 @@
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
         </div>
-        <div class="bg-gray-700 p-4 rounded-lg text-white">
-            <h2 class="text-xl font-bold mb-3 border-b border-gray-500 pb-2">Instrucciones del Juego:</h2>
+        <div class="bg-blue-50 p-4 rounded-lg text-blue-900 border border-blue-100">
+            <h2 class="text-xl font-bold mb-3 border-b border-blue-200 pb-2">Instrucciones del Juego:</h2>
             <ul class="list-disc list-inside space-y-1 text-sm">
                 <li><b>Movimiento:</b> Usa las flechas (↑ ↓ ← →).</li>
-                <li><b>Deshacer:</b> Presiona la tecla 'U' (Usa la Pila para el historial).</li>
-                <li><b>Interacción:</b> Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
+                <li><b>Deshacer:</b> Presiona la tecla <b>U</b> para retroceder un movimiento.</li>
+                <li><b>Avanzar de nivel:</b> Cuando completes el objetivo, presiona <b>ENTER</b>.</li>
+                <li><b>Objetos:</b> Recolecta <span class="text-yellow-600">flores mágicas</span>, vence <span class="text-pink-500">plantas pícaras</span> y encuentra el <span class="text-yellow-500">hongo dorado</span>.</li>
+                <li><b>Diálogo:</b> Habla con los <span class="text-orange-400">honguitos parlantes</span> para recibir mensajes.</li>
             </ul>
-            <p class="mt-3 text-xs text-gray-400 text-center">El código y la Matriz se ejecutan correctamente en el servidor.</p>
-            <p class="text-xs text-gray-400 text-center">Por Mariam</p>
+            <p class="mt-3 text-xs text-blue-400 text-center">Proyecto de Estructura de Datos | Por Mariam</p>
         </div>
     </div>
     <script>
