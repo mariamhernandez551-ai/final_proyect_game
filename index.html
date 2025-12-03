@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <title>El Mini Bosque - Proyecto Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Estilos Tailwind CSS para una presentación moderna -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilo base para el Applet */
         #bosqueApplet {
             display: block;
             margin: 0 auto;
@@ -18,56 +17,45 @@
             height: 520px;
         }
     </style>
-    <!-- Script de Cheerpj (Obligatorio para correr Applets en navegadores modernos) -->
-    <!-- CRÍTICO: Usamos el atributo data-cheerpj-init="Applet.start" para forzar el inicio -->
+    <!-- CheerpJ -->
     <script src="https://unpkg.com/cheerpj@2.5/cheerpj.js" id="cheerpj-script"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
 
     <div class="max-w-xl w-full bg-white p-6 rounded-xl shadow-2xl mt-8">
         <h1 class="text-3xl font-extrabold text-green-700 text-center mb-2">🌳 El Bosque de los Susurros 🌳</h1>
-        
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-sm" role="alert">
-            <p>**ENTREGA FINAL** El Applet se está forzando a cargar con Java 11. Puede tomar unos 5 a 10 segundos en aparecer por primera vez. ¡Ya casi lo tienes!</p>
+            <p><b>ENTREGA FINAL</b> El Applet se está forzando a cargar con Java 11. Puede tomar unos 5 a 10 segundos en aparecer por primera vez. ¡Ya casi lo tienes!</p>
         </div>
-
-        <!-- Contenedor del Applet con el atributo de compatibilidad Java 11 -->
         <div class="flex justify-center mb-6" id="applet-container">
-            <!-- Quitamos el display:none y usamos el init forzado -->
-            <applet 
-                id="bosqueApplet" 
-                code="BosqueApplet.class" 
-                width="400" 
-                height="520" 
+            <applet
+                id="bosqueApplet"
+                archive="BosqueApplet.jar"
+                code="BosqueApplet"
+                width="400"
+                height="520"
                 data-cheerpj-jvm-version="11"
                 data-cheerpj-init="Applet.start">
                 Tu navegador no soporta la ejecución de Applets de Java.
             </applet>
-            
         </div>
-
-        <!-- PANEL DE INSTRUCCIONES -->
         <div class="bg-gray-700 p-4 rounded-lg text-white">
             <h2 class="text-xl font-bold mb-3 border-b border-gray-500 pb-2">Instrucciones del Juego:</h2>
             <ul class="list-disc list-inside space-y-1 text-sm">
-                <li>**Movimiento:** Usa las flechas (↑ ↓ ← →).</li>
-                <li>**Deshacer:** Presiona la tecla 'U' (Usa la Pila para el historial).</li>
-                <li>**Interacción:** Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
+                <li><b>Movimiento:</b> Usa las flechas (↑ ↓ ← →).</li>
+                <li><b>Deshacer:</b> Presiona la tecla 'U' (Usa la Pila para el historial).</li>
+                <li><b>Interacción:</b> Muévete sobre Honguitos (Cola) y Tesoros (Lista).</li>
             </ul>
             <p class="mt-3 text-xs text-gray-400 text-center">El código y la Matriz se ejecutan correctamente en el servidor.</p>
             <p class="text-xs text-gray-400 text-center">Por Mariam</p>
         </div>
     </div>
-    
-    <!-- Quitamos el script grande y solo aseguramos que el motor esté listo -->
     <script>
-        // Esto solo asegura que el script de Cheerpj se ejecute, pero la carga la maneja el atributo 'data-cheerpj-init'
         window.onload = function() {
             if (typeof cpjRunApplet === 'function') {
                 cpjRunApplet();
             }
         };
     </script>
-
 </body>
 </html>
