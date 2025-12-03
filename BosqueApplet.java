@@ -13,9 +13,8 @@ import java.util.Stack;
  * Proyecto Final de Estructura de Datos: "Bosque de los Susurros"
  * Implementación de un juego simple basado en Applet, utilizando las estructuras
  * de Matriz, Lista, Cola y Pila.
- * * NOTA CRÍTICA: Este código tiene activada una PRUEBA DE DIAGNÓSTICO
- * en el método paint() para asegurar que el Applet se muestre en el navegador
- * a través de Cheerpj. Si ves un fondo rojo, la carga es exitosa.
+ * NOTA: La prueba de diagnóstico de fondo rojo ha sido eliminada.
+ * Este código contiene la lógica completa para dibujar el tablero y el panel de información.
  */
 public class BosqueApplet extends Applet implements KeyListener {
 
@@ -92,33 +91,12 @@ public class BosqueApplet extends Applet implements KeyListener {
         }
     }
 
-    // --- 4. DIBUJO EN PANTALLA ---
+    // --- 4. DIBUJO EN PANTALLA (CÓDIGO DE JUEGO ACTIVO) ---
 
     @Override
     public void paint(Graphics g) {
         
-        // **********************************************
-        // ******* INICIO PRUEBA DE DIAGNÓSTICO *********
-        // **********************************************
-        
-        // Si esta sección se dibuja, Cheerpj está ejecutando el código Java
-        g.setColor(Color.RED);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("¡CARGA EXITOSA!", 100, 250);
-        
-        // Si ves el fondo rojo, el problema es en el código de dibujo original.
-        // Si no ves nada, el problema está en la inicialización (init/start) o en la Matriz.
-        
-        // **********************************************
-        // ********* FIN PRUEBA DE DIAGNÓSTICO **********
-        // **********************************************
-
-
-        /*
-         * *** CÓDIGO ORIGINAL (DESCOMENTAR SI LA PRUEBA ROJA FUNCIONA) ***
-         * // 1. Dibujar Mapa (Matriz 10x10)
+        // 1. Dibujar Mapa (Matriz 10x10)
         for (int i = 0; i < mapa.length; i++) {
             for (int j = 0; j < mapa[0].length; j++) {
                 int x = j * TILE_SIZE;
@@ -165,7 +143,6 @@ public class BosqueApplet extends Applet implements KeyListener {
         // 5. Mostrar Atributos (Array 1D)
         g.drawString(String.format("HP: %d | Atk: %d | Def: %d", 
             aventureroAtributos[0], aventureroAtributos[1], aventureroAtributos[2]), 10, 510);
-        */
     }
 
     // --- 5. LÓGICA DE MOVIMIENTO ---
